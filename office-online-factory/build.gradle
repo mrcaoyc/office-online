@@ -1,0 +1,9 @@
+dependencies {
+    implementation platform("org.springframework.boot:spring-boot-starter-parent:${springBootVersion}")
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'com.spring4all:swagger-spring-boot-starter:1.9.0.RELEASE'
+    api 'commons-io:commons-io:2.6'
+    api 'com.github.mrcaoyc:web-spring-boot-starter:1.0.0-SNAPSHOT'
+    annotationProcessor('org.projectlombok:lombok:1.18.8')
+    compileOnly('org.projectlombok:lombok:1.18.8')
+}

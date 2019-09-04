@@ -1,0 +1,3 @@
+rootProject.name = 'office-online'
+include 'office-online-factory'
+
