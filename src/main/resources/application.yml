@@ -4,3 +4,5 @@ office-online:
 logging:
   level:
     - DEBUG
+server:
+  max-http-header-size: 1MB

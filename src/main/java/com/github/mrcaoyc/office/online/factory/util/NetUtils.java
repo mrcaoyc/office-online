@@ -1,7 +1,7 @@
 package com.github.mrcaoyc.office.online.factory.util;
 
 import com.github.mrcaoyc.common.exception.runtime.DataNotFoundException;
-import com.github.mrcaoyc.office.online.factory.autoconfigurer.FileErrorEnum;
+import com.github.mrcaoyc.office.online.factory.constants.FileErrorEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;

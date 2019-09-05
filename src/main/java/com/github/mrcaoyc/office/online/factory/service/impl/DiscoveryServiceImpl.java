@@ -7,6 +7,7 @@ import com.github.mrcaoyc.office.online.factory.constants.ActionEnum;
 import com.github.mrcaoyc.office.online.factory.constants.OfficeOnlineAction;
 import com.github.mrcaoyc.office.online.factory.constants.OfficeOnlineErrorMessage;
 import com.github.mrcaoyc.office.online.factory.service.DiscoveryService;
+import com.github.mrcaoyc.office.online.factory.service.JwtService;
 import com.github.mrcaoyc.web.constant.GlobalErrorMessage;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
@@ -23,14 +24,16 @@ import java.text.MessageFormat;
 @Service
 public class DiscoveryServiceImpl implements DiscoveryService {
     private final OfficeOnlineConfiguration officeOnlineConfiguration;
+    private final JwtService jwtService;
 
-    public DiscoveryServiceImpl(OfficeOnlineConfiguration officeOnlineConfiguration) {
+    public DiscoveryServiceImpl(OfficeOnlineConfiguration officeOnlineConfiguration,
+                                JwtService jwtService) {
         this.officeOnlineConfiguration = officeOnlineConfiguration;
+        this.jwtService = jwtService;
     }
 
     @Override
     public String getActionUrl(ActionEnum action, String filePath) {
-
         String extension = FilenameUtils.getExtension(filePath);
         if (StringUtils.isEmpty(extension)) {
             throw new BadRequestException(OfficeOnlineErrorMessage.NONSUPPORT);
@@ -41,7 +44,7 @@ public class DiscoveryServiceImpl implements DiscoveryService {
         }
         String wopiSrc = MessageFormat.format("{0}/wopi/files/{1}",
                 officeOnlineConfiguration.getDomainServerHost(),
-                new String(Base64Utils.encode(filePath.getBytes(StandardCharsets.UTF_8)))
+                Base64Utils.encodeToString(filePath.getBytes(StandardCharsets.UTF_8))
         );
         String wopiSrcURLEncoder;
         try {
@@ -49,9 +52,11 @@ public class DiscoveryServiceImpl implements DiscoveryService {
         } catch (Exception e) {
             throw new BaseRuntimeException(GlobalErrorMessage.INTERNAL_SERVER_ERROR, e);
         }
-        return MessageFormat.format("{0}/{1}?WOPISrc={2}",
+        String accessToken = Base64Utils.encodeToString(jwtService.generateKey().getBytes(StandardCharsets.UTF_8));
+        return MessageFormat.format("{0}/{1}?access_token={2}&WOPISrc={3}",
                 officeOnlineConfiguration.getHost(),
                 actionUrl,
+                accessToken,
                 wopiSrcURLEncoder
         );
     }

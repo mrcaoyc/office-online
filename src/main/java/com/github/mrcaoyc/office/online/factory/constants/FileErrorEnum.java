@@ -1,4 +1,4 @@
-package com.github.mrcaoyc.office.online.factory.autoconfigurer;
+package com.github.mrcaoyc.office.online.factory.constants;
 
 
 import com.github.mrcaoyc.common.errormessage.BaseErrorMessage;

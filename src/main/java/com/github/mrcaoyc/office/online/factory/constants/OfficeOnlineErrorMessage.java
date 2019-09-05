@@ -6,7 +6,11 @@ import com.github.mrcaoyc.common.errormessage.BaseErrorMessage;
  * @author CaoYongCheng
  */
 public enum OfficeOnlineErrorMessage implements BaseErrorMessage {
-    NONSUPPORT(101, "暂不支持该操作！");
+    /**
+     *
+     */
+    NONSUPPORT(101, "暂不支持该操作！"),
+    UNAUTHORIZED(102, "未授权认证");
     private int code;
     private String message;
 

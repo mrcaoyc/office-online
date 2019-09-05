@@ -1,35 +1,31 @@
-buildscript {
-    ext {
-        springBootVersion = '2.1.7.RELEASE'
-    }
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
-    }
+plugins {
+    id 'java-library'
+    id 'idea'
+    id 'org.springframework.boot' version '2.1.7.RELEASE'
 }
 
-allprojects {
-    group 'com.github.mrcaoyc'
-    version '1.0-SNAPSHOT'
+group 'com.github.mrcaoyc'
+version '1.0-SNAPSHOT'
+
+
+// 指定JDK版本
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    maven { url "https://raw.github.com/mrcaoyc/maven-repo/releases/" }
+    mavenCentral()
 }
 
-subprojects {
-
-    ext {
-        springBootVersion = '2.1.7.RELEASE'
-    }
-    apply plugin: 'java-library'
-    // 指定JDK版本
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
-
-    // 指定编码格式
-    [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
-    repositories {
-        maven { url "https://raw.github.com/mrcaoyc/maven-repo/releases/" }
-        mavenCentral()
-    }
+dependencies {
+    implementation platform("org.springframework.boot:spring-boot-starter-parent:2.1.7.RELEASE")
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'com.spring4all:swagger-spring-boot-starter:1.9.0.RELEASE'
+    implementation "io.jsonwebtoken:jjwt:0.9.1"
+    implementation 'commons-io:commons-io:2.6'
+    implementation 'com.alibaba:fastjson:1.2.60'
+    api 'com.github.mrcaoyc:web-spring-boot-starter:1.0.0-SNAPSHOT'
+    annotationProcessor('org.projectlombok:lombok:1.18.8')
+    compileOnly('org.projectlombok:lombok:1.18.8')
 }
 
