@@ -7,9 +7,7 @@ import com.github.mrcaoyc.web.constant.GlobalErrorMessage;
 import io.swagger.annotations.Api;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -19,6 +17,7 @@ import java.net.URLDecoder;
  */
 @RestController
 @Api
+@RequestMapping("/wopi")
 public class DiscoveryController {
     private final DiscoveryService discoveryService;
 
@@ -26,7 +25,8 @@ public class DiscoveryController {
         this.discoveryService = discoveryService;
     }
 
-    @GetMapping("/discovery/embed-view")
+
+    @GetMapping(value = "/embed-view")
     public HttpEntity<?> getEmbedView(@RequestParam String path) {
         String decodePath;
         try {
