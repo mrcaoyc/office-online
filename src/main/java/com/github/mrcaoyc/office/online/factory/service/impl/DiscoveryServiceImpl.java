@@ -1,7 +1,7 @@
 package com.github.mrcaoyc.office.online.factory.service.impl;
 
-import com.github.mrcaoyc.common.exception.runtime.BadRequestException;
 import com.github.mrcaoyc.common.exception.runtime.BaseRuntimeException;
+import com.github.mrcaoyc.common.exception.runtime.BusinessException;
 import com.github.mrcaoyc.office.online.factory.autoconfigurer.OfficeOnlineConfiguration;
 import com.github.mrcaoyc.office.online.factory.constants.ActionEnum;
 import com.github.mrcaoyc.office.online.factory.constants.OfficeOnlineAction;
@@ -36,15 +36,15 @@ public class DiscoveryServiceImpl implements DiscoveryService {
     public String getActionUrl(ActionEnum action, String filePath) {
         String extension = FilenameUtils.getExtension(filePath);
         if (StringUtils.isEmpty(extension)) {
-            throw new BadRequestException(OfficeOnlineErrorMessage.NONSUPPORT);
+            throw new BusinessException(OfficeOnlineErrorMessage.NONSUPPORT);
         }
         String actionUrl = OfficeOnlineAction.parse(action, extension);
         if (actionUrl == null) {
-            throw new BadRequestException(OfficeOnlineErrorMessage.NONSUPPORT);
+            throw new BusinessException(OfficeOnlineErrorMessage.NONSUPPORT);
         }
         String wopiSrc = MessageFormat.format("{0}/wopi/files/{1}",
                 officeOnlineConfiguration.getDomainServerHost(),
-                Base64Utils.encodeToString(filePath.getBytes(StandardCharsets.UTF_8))
+                Base64Utils.encodeToUrlSafeString(filePath.getBytes(StandardCharsets.UTF_8))
         );
         String wopiSrcURLEncoder;
         try {
@@ -53,11 +53,16 @@ public class DiscoveryServiceImpl implements DiscoveryService {
             throw new BaseRuntimeException(GlobalErrorMessage.INTERNAL_SERVER_ERROR, e);
         }
         String accessToken = Base64Utils.encodeToString(jwtService.generateKey().getBytes(StandardCharsets.UTF_8));
-        return MessageFormat.format("{0}/{1}?access_token={2}&WOPISrc={3}",
+        // 如果actionUrl中包含问号，表示已有参数，后面需要接&
+        String connector = actionUrl.contains("?") ? "&" : "?";
+        return MessageFormat.format("{0}/{1}{2}access_token={3}&WOPISrc={4}",
                 officeOnlineConfiguration.getHost(),
                 actionUrl,
+                connector,
                 accessToken,
                 wopiSrcURLEncoder
         );
+
+
     }
 }

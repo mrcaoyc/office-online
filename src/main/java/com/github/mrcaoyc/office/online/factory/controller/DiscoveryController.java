@@ -37,4 +37,28 @@ public class DiscoveryController {
         String actionUrl = discoveryService.getActionUrl(ActionEnum.EMBED_VIEW, decodePath);
         return ResponseEntity.ok(actionUrl);
     }
+
+    @GetMapping(value = "/view")
+    public HttpEntity<?> getView(@RequestParam String path) {
+        String decodePath;
+        try {
+            decodePath = URLDecoder.decode(path, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new BaseRuntimeException(GlobalErrorMessage.INTERNAL_SERVER_ERROR, e);
+        }
+        String actionUrl = discoveryService.getActionUrl(ActionEnum.VIEW, decodePath);
+        return ResponseEntity.ok(actionUrl);
+    }
+
+    @GetMapping(value = "/mobile_view")
+    public HttpEntity<?> getMobileView(@RequestParam String path) {
+        String decodePath;
+        try {
+            decodePath = URLDecoder.decode(path, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new BaseRuntimeException(GlobalErrorMessage.INTERNAL_SERVER_ERROR, e);
+        }
+        String actionUrl = discoveryService.getActionUrl(ActionEnum.MOBILE_VIEW, decodePath);
+        return ResponseEntity.ok(actionUrl);
+    }
 }
