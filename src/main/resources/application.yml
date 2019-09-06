@@ -1,6 +1,7 @@
 office-online:
   host:  http://192.168.200.40
   domain-server-host:  http://192.168.200.39
+  referer: openschool.devp.eastedu.ltd
 logging:
   level:
     - DEBUG

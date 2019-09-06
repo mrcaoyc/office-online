@@ -4,6 +4,7 @@ import com.github.mrcaoyc.common.exception.runtime.DataNotFoundException;
 import com.github.mrcaoyc.office.online.factory.constants.FileErrorEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
@@ -18,11 +19,15 @@ public class NetUtils {
     /**
      * 下载文件，获取字节码
      *
-     * @param url 文件url
+     * @param url     文件url
+     * @param referer 用于解决防盗链无法访问资源问题
      * @return 文件字节
      */
-    public static byte[] downloadFile(String url) {
+    public static byte[] downloadFile(String url, String referer) {
         HttpHeaders headers = new HttpHeaders();
+        if (!StringUtils.isEmpty(referer)) {
+            headers.add("Referer", referer);
+        }
         HttpEntity<Resource> httpEntity = new HttpEntity<>(headers);
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<byte[]> response = restTemplate.exchange(url, HttpMethod.GET,

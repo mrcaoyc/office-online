@@ -1,6 +1,7 @@
 package com.github.mrcaoyc.office.online.factory.controller;
 
 import com.github.mrcaoyc.common.exception.runtime.BaseRuntimeException;
+import com.github.mrcaoyc.office.online.factory.autoconfigurer.OfficeOnlineConfiguration;
 import com.github.mrcaoyc.office.online.factory.model.vo.FileInfoResponse;
 import com.github.mrcaoyc.office.online.factory.util.DigestUtils;
 import com.github.mrcaoyc.office.online.factory.util.NetUtils;
@@ -27,6 +28,12 @@ import java.nio.charset.StandardCharsets;
 @RequestMapping(value = "/wopi")
 public class FileContentController {
 
+    private final OfficeOnlineConfiguration officeOnlineConfiguration;
+
+    public FileContentController(OfficeOnlineConfiguration officeOnlineConfiguration) {
+        this.officeOnlineConfiguration = officeOnlineConfiguration;
+    }
+
     /**
      * 获取文件流
      * <p>
@@ -37,12 +44,11 @@ public class FileContentController {
      */
     @GetMapping("/files/{name}/contents")
     public void getFile(@PathVariable(name = "name") String name, HttpServletResponse response) {
-        System.out.println("GET获取文件啦!!!!");
         OutputStream outputStream = null;
         try {
             // 文件的路径
             String fileName = getFileRealPath(name);
-            byte[] fileBytes = NetUtils.downloadFile(fileName);
+            byte[] fileBytes = NetUtils.downloadFile(fileName, officeOnlineConfiguration.getReferer());
             // 以流的形式下载文件
             // 清空response
             response.reset();
@@ -75,12 +81,12 @@ public class FileContentController {
      * @param name 文件名称
      */
     @GetMapping(value = "/files/{name}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public HttpEntity<?> getFileInfo(@PathVariable String name,@RequestParam(required = false,name = "access_token") String accessToken) {
+    public HttpEntity<?> getFileInfo(@PathVariable String name) {
         System.out.println("获取文件信息");
         FileInfoResponse info = new FileInfoResponse();
 
         String fileName = getFileRealPath(name);
-        byte[] bytes = NetUtils.downloadFile(fileName);
+        byte[] bytes = NetUtils.downloadFile(fileName, officeOnlineConfiguration.getReferer());
         // 取得文件名
         info.setBaseFileName(DigestUtils.computeMd5(fileName) + "." + NetUtils.getFileExtension(fileName));
         info.setSize((long) bytes.length);
