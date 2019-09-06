@@ -6,11 +6,17 @@ import com.github.mrcaoyc.office.online.factory.model.vo.FileInfoResponse;
 import com.github.mrcaoyc.office.online.factory.util.DigestUtils;
 import com.github.mrcaoyc.office.online.factory.util.NetUtils;
 import com.github.mrcaoyc.web.constant.GlobalErrorMessage;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Base64Utils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -26,6 +32,7 @@ import java.nio.charset.StandardCharsets;
  */
 @RestController
 @RequestMapping(value = "/wopi")
+@Api(tags = "文件信息")
 public class FileContentController {
 
     private final OfficeOnlineConfiguration officeOnlineConfiguration;
@@ -34,14 +41,8 @@ public class FileContentController {
         this.officeOnlineConfiguration = officeOnlineConfiguration;
     }
 
-    /**
-     * 获取文件流
-     * <p>
-     * office online server 读取文件流
-     *
-     * @param name     文件名称
-     * @param response 文件流
-     */
+    @ApiOperation(value = "获取文件流", response = OutputStream.class)
+    @ApiImplicitParam(name = "name", value = "文件路径", dataTypeClass = String.class, paramType = "path")
     @GetMapping("/files/{name}/contents")
     public void getFile(@PathVariable(name = "name") String name, HttpServletResponse response) {
         OutputStream outputStream = null;
@@ -61,7 +62,6 @@ public class FileContentController {
             outputStream = response.getOutputStream();
             outputStream.write(fileBytes);
             outputStream.flush();
-            System.out.println("GET获取文件Contents结束!!!!");
         } catch (IOException ex) {
             ex.printStackTrace();
         } finally {
@@ -75,16 +75,12 @@ public class FileContentController {
         }
     }
 
-    /**
-     * 获取文件信息
-     *
-     * @param name 文件名称
-     */
+
+    @ApiOperation(value = "获取文件信息", response = FileInfoResponse.class)
+    @ApiImplicitParam(name = "name", value = "文件路径", dataTypeClass = String.class, paramType = "path")
     @GetMapping(value = "/files/{name}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public HttpEntity<?> getFileInfo(@PathVariable String name) {
-        System.out.println("获取文件信息");
         FileInfoResponse info = new FileInfoResponse();
-
         String fileName = getFileRealPath(name);
         byte[] bytes = NetUtils.downloadFile(fileName, officeOnlineConfiguration.getReferer());
         // 取得文件名
@@ -92,7 +88,7 @@ public class FileContentController {
         info.setSize((long) bytes.length);
         info.setOwnerId("admin");
         // 将dateId设置给version，相同的version，office-online会自动缓存
-        long dateId = System.currentTimeMillis() / 1000 / 3600 / 24;
+        long dateId = System.currentTimeMillis() / 1000 / officeOnlineConfiguration.getFileCacheExpires();
         info.setVersion(dateId);
         info.setSha256(DigestUtils.computeSha256(bytes));
         info.setAllowExternalMarketplace(true);
@@ -101,7 +97,6 @@ public class FileContentController {
         info.setSupportsLocks(true);
 
         return ResponseEntity.ok(info);
-
     }
 
     /**

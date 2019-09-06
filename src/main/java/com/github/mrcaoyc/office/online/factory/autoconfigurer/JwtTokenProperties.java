@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "mrcaoyc.jwt")
+@ConfigurationProperties(prefix = "office-online.jwt")
 public class JwtTokenProperties {
     /**
      * 令牌签名密匙

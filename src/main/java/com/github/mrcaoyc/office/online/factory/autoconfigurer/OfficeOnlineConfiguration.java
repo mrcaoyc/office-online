@@ -25,4 +25,9 @@ public class OfficeOnlineConfiguration {
      * 指定referer，解决防盗链问题
      */
     private String referer;
+
+    /**
+     * 单位（秒）
+     */
+    private Long fileCacheExpires = 3600 * 24L;
 }
