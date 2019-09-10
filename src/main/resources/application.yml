@@ -5,6 +5,8 @@ office-online:
   host:  http://192.168.200.40
   domain-server-host:  http://192.168.200.39
   referer: openschool.devp.eastedu.ltd
+  jwt:
+    expiresTime: 43200
 logging:
   file:
     max-size: 10MB
@@ -18,6 +20,9 @@ management:
     web:
       exposure:
         include: "*"
+  endpoint:
+    health:
+      show-details: always
 
 swagger:
   exclude-path:

@@ -2,13 +2,16 @@ package com.github.mrcaoyc.office.online.factory.controller;
 
 import com.github.mrcaoyc.common.exception.runtime.BaseRuntimeException;
 import com.github.mrcaoyc.office.online.factory.autoconfigurer.OfficeOnlineConfiguration;
+import com.github.mrcaoyc.office.online.factory.model.dto.FileInfoDTO;
 import com.github.mrcaoyc.office.online.factory.model.vo.FileInfoResponse;
+import com.github.mrcaoyc.office.online.factory.service.FileService;
 import com.github.mrcaoyc.office.online.factory.util.DigestUtils;
 import com.github.mrcaoyc.office.online.factory.util.NetUtils;
 import com.github.mrcaoyc.web.constant.GlobalErrorMessage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -36,9 +39,11 @@ import java.nio.charset.StandardCharsets;
 public class FileContentController {
 
     private final OfficeOnlineConfiguration officeOnlineConfiguration;
+    private final FileService fileService;
 
-    public FileContentController(OfficeOnlineConfiguration officeOnlineConfiguration) {
+    public FileContentController(OfficeOnlineConfiguration officeOnlineConfiguration, FileService fileService) {
         this.officeOnlineConfiguration = officeOnlineConfiguration;
+        this.fileService = fileService;
     }
 
     @ApiOperation(value = "获取文件流", response = OutputStream.class)
@@ -80,23 +85,11 @@ public class FileContentController {
     @ApiImplicitParam(name = "name", value = "文件路径", dataTypeClass = String.class, paramType = "path")
     @GetMapping(value = "/files/{name}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public HttpEntity<?> getFileInfo(@PathVariable String name) {
-        FileInfoResponse info = new FileInfoResponse();
         String fileName = getFileRealPath(name);
-        byte[] bytes = NetUtils.downloadFile(fileName, officeOnlineConfiguration.getReferer());
-        // 取得文件名
-        info.setBaseFileName(DigestUtils.computeMd5(fileName) + "." + NetUtils.getFileExtension(fileName));
-        info.setSize((long) bytes.length);
-        info.setOwnerId("admin");
-        // 将dateId设置给version，相同的version，office-online会自动缓存
-        long dateId = System.currentTimeMillis() / 1000 / officeOnlineConfiguration.getFileCacheExpires();
-        info.setVersion(dateId);
-        info.setSha256(DigestUtils.computeSha256(bytes));
-        info.setAllowExternalMarketplace(true);
-        info.setUserCanWrite(true);
-        info.setSupportsUpdate(true);
-        info.setSupportsLocks(true);
-
-        return ResponseEntity.ok(info);
+        FileInfoDTO fileInfo = fileService.getFileInfo(fileName);
+        FileInfoResponse fileInfoResponse = new FileInfoResponse();
+        BeanUtils.copyProperties(fileInfo, fileInfoResponse);
+        return ResponseEntity.ok(fileInfoResponse);
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.github.mrcaoyc.office.online.factory.autoconfigurer;
 
 import com.github.mrcaoyc.office.online.factory.filter.AuthorizationFilter;
+import com.github.mrcaoyc.office.online.factory.filter.LogFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -19,6 +20,8 @@ public class SpringMvcConfigurer implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(logFilter())
+                .addPathPatterns("/**");
         registry.addInterceptor(authorizationFilter())
                 .addPathPatterns("/wopi/files/{name}");
     }
@@ -26,5 +29,10 @@ public class SpringMvcConfigurer implements WebMvcConfigurer {
     @Bean
     public AuthorizationFilter authorizationFilter() {
         return new AuthorizationFilter(jwtTokenProperties);
+    }
+
+    @Bean
+    public LogFilter logFilter() {
+        return new LogFilter();
     }
 }

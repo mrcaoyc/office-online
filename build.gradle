@@ -21,12 +21,17 @@ dependencies {
     implementation platform("org.springframework.boot:spring-boot-starter-parent:2.1.7.RELEASE")
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'com.spring4all:swagger-spring-boot-starter:1.9.0.RELEASE'
     implementation "io.jsonwebtoken:jjwt:0.9.1"
     implementation 'commons-io:commons-io:2.6'
     implementation 'com.alibaba:fastjson:1.2.60'
+    implementation 'org.ehcache:ehcache:3.8.0'
     api 'com.github.mrcaoyc:web-spring-boot-starter:1.0.0-SNAPSHOT'
     annotationProcessor('org.projectlombok:lombok:1.18.8')
     compileOnly('org.projectlombok:lombok:1.18.8')
 }
 
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor(0, 'seconds')
+}

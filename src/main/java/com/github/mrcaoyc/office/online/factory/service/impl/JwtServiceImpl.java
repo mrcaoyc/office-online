@@ -24,21 +24,20 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public String generateKey() {
         Map<String, Object> payload = new HashMap<>(0);
-        return generateToken(payload, jwtTokenProperties.getExpiresTime());
+        return generateToken(payload);
     }
 
     /**
      * 创建jwt
      *
-     * @param payload     jwt中载荷
-     * @param expiresTime 到期时间
+     * @param payload jwt中载荷
      * @return 令牌
      */
-    private String generateToken(Map<String, Object> payload, long expiresTime) {
+    private String generateToken(Map<String, Object> payload) {
         String secret = jwtTokenProperties.getSecret();
         SignatureAlgorithm algorithm = SignatureAlgorithm.forName(jwtTokenProperties.getAlgorithm());
         long now = System.currentTimeMillis();
-        Date expTime = new Date(now + 1000 * expiresTime);
+        Date expTime = new Date(now + 1000 * jwtTokenProperties.getExpiresTime());
         return jwtTokenProperties.getType() + " " + Jwts.builder()
                 .setClaims(payload)
                 .setExpiration(expTime)
